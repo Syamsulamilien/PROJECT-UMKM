@@ -1,0 +1,70 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Shopping Cart</h2>
+            @if($cartItems->count() > 0)
+                <div class="divide-y divide-gray-200">
+                    @foreach($cartItems as $item)
+                    <div class="py-6 flex items-center">
+                        <img src="{{ asset($item->product->image) }}" alt="{{ $item->product->name }}" 
+                             class="w-24 h-24 object-cover rounded">
+                        <div class="ml-4 flex-1">
+                            <h3 class="text-lg font-medium text-gray-900">{{ $item->product->name }}</h3>
+                            <p class="mt-1 text-sm text-gray-500">{{ $item->product->category->name }}</p>
+                            <p class="mt-1 text-sm font-medium text-[#44318D]">
+                                Rp {{ number_format($item->product->price, 0, ',', '.') }}
+                            </p>
+                            <form action="{{ route('cart.update', $item) }}" method="POST" class="mt-2 flex items-center">
+                                @csrf
+                                @method('PATCH')
+                                <label for="quantity-{{ $item->id }}" class="sr-only">Quantity</label>
+                                <input type="number" id="quantity-{{ $item->id }}" name="quantity" 
+                                       value="{{ $item->quantity }}" min="1" max="{{ $item->product->stock }}"
+                                       class="shadow-sm focus:ring-[#44318D] focus:border-[#44318D] block w-20 sm:text-sm border-gray-300 rounded-md">
+                                <button type="submit" class="ml-2 text-sm text-[#44318D] hover:text-[#2A1B3D]">
+                                    Update
+                                </button>
+                            </form>
+                        </div>
+                        <form method="POST" action="{{ route('cart.remove', $item) }}" class="ml-4">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900">Remove</button>
+                        </form>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="mt-8 border-t border-gray-200 pt-6">
+                    <div class="flex justify-between text-base font-medium text-gray-900">
+                        <p>Subtotal</p>
+                        <p>Rp {{ number_format($total, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{{ route('checkout.index') }}" 
+                           class="block w-full bg-[#44318D] text-white text-center py-3 rounded-md hover:bg-[#2A1B3D]">
+                            Proceed to Checkout
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ route('home') }}" 
+                           class="block w-full bg-gray-200 text-gray-700 text-center py-3 rounded-md hover:bg-gray-300">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            @else
+                <p class="text-gray-500 text-center py-8">Your cart is empty.</p>
+                <div class="mt-4">
+                    <a href="{{ route('home') }}" 
+                       class="block w-full bg-[#44318D] text-white text-center py-3 rounded-md hover:bg-[#2A1B3D]">
+                        Start Shopping
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection
